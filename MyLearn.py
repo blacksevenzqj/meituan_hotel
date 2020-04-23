@@ -7,7 +7,7 @@ from pyquery import PyQuery as pq
 from db.Db import Db
 from multiprocessing import Pool
 
-class Meituan:
+class Meituan2:
     def __init__(self, db_config):
         """
         :param db_config:数据库连接配置
@@ -140,46 +140,6 @@ class Meituan:
             raise e
 
 
-    # def read_city_hotels(self, name):
-    #     '''
-    #     读取指定城市的酒店列表
-    #     :param name:城市名的拼音，如 昆明：kunming,郑州：zhengzhou
-    #     :return:
-    #     '''
-    #     # rel = []
-    #     page = 1
-    #     while True:
-    #         url = r'https://i.meituan.com/s/%s-电竞酒店?p=%d' % (name, page)
-    #         content = self.request(url).text
-    #         document = pq(content)
-    #         hotel_list_selecter = document('dd.poi-list-item')
-    #         length = hotel_list_selecter.length
-    #         if length < 1:
-    #             break
-
-    #         for item in hotel_list_selecter.items():
-    #             score = item.find('em.star-text').text().strip()
-    #             link = item.find('a').attr('href')
-    #             id = re.search(r'/(\d+)', link)
-    #             if id:  # 没有id  应该就是广告
-    #                 id = id.group(1)
-    #             else:
-    #                 continue
-
-    #             # 酒店信息
-    #             rel_item = (
-    #                 int(id),
-    #                 item.find('span.poiname').text().strip(),  # 标题
-    #                 float(score if score else 0),  # 评分
-    #                 item.find('p[data-com]').text().strip(),  # 地址
-    #             )
-    #             yield rel_item
-    #             # rel.append(rel_item)
-    #         else:
-    #             page = page + 1
-
-    #     # return rel
-                
     def read_city_hotels(self, name):
         '''
         读取指定城市的酒店列表
@@ -188,36 +148,76 @@ class Meituan:
         '''
         # rel = []
         page = 1
-        url = r'https://i.meituan.com/s/%s-电竞酒店?p=%d' % (name, page)
-        content = self.request(url).text
-        document = pq(content)
-        hotel_list_selecter = document('dd.poi-list-item')
-        length = hotel_list_selecter.length
-        if length < 1:
-            return
+        while True:
+            url = r'https://i.meituan.com/s/%s-电竞酒店?p=%d' % (name, page)
+            content = self.request(url).text
+            document = pq(content)
+            hotel_list_selecter = document('dd.poi-list-item')
+            length = hotel_list_selecter.length
+            if length < 1:
+                break
 
-        for item in hotel_list_selecter.items():
-            score = item.find('em.star-text').text().strip()
-            link = item.find('a').attr('href')
-            id = re.search(r'/(\d+)', link)
-            if id:  # 没有id  应该就是广告
-                id = id.group(1)
+            for item in hotel_list_selecter.items():
+                score = item.find('em.star-text').text().strip()
+                link = item.find('a').attr('href')
+                id = re.search(r'/(\d+)', link)
+                if id:  # 没有id  应该就是广告
+                    id = id.group(1)
+                else:
+                    continue
+
+                # 酒店信息
+                rel_item = (
+                    int(id),
+                    item.find('span.poiname').text().strip(),  # 标题
+                    float(score if score else 0),  # 评分
+                    item.find('p[data-com]').text().strip(),  # 地址
+                )
+                yield rel_item
+                # rel.append(rel_item)
             else:
-                return
-
-            # 酒店信息
-            rel_item = (
-                int(id),
-                item.find('span.poiname').text().strip(),  # 标题
-                float(score if score else 0),  # 评分
-                item.find('p[data-com]').text().strip(),  # 地址
-            )
-            yield rel_item
-            # rel.append(rel_item)
-        else:
-            page = page + 1
+                page = page + 1
 
         # return rel
+                
+    # def read_city_hotels(self, name):
+    #     '''
+    #     读取指定城市的酒店列表
+    #     :param name:城市名的拼音，如 昆明：kunming,郑州：zhengzhou
+    #     :return:
+    #     '''
+    #     # rel = []
+    #     page = 1
+    #     url = r'https://i.meituan.com/s/%s-电竞酒店?p=%d' % (name, page)
+    #     content = self.request(url).text
+    #     document = pq(content)
+    #     hotel_list_selecter = document('dd.poi-list-item')
+    #     length = hotel_list_selecter.length
+    #     if length < 1:
+    #         return
+    #
+    #     for item in hotel_list_selecter.items():
+    #         score = item.find('em.star-text').text().strip()
+    #         link = item.find('a').attr('href')
+    #         id = re.search(r'/(\d+)', link)
+    #         if id:  # 没有id  应该就是广告
+    #             id = id.group(1)
+    #         else:
+    #             return
+    #
+    #         # 酒店信息
+    #         rel_item = (
+    #             int(id),
+    #             item.find('span.poiname').text().strip(),  # 标题
+    #             float(score if score else 0),  # 评分
+    #             item.find('p[data-com]').text().strip(),  # 地址
+    #         )
+    #         yield rel_item
+    #         # rel.append(rel_item)
+    #     else:
+    #         page = page + 1
+    #
+    #     # return rel
 
 
     def read_hotel_info(self, id):
@@ -328,47 +328,47 @@ class Meituan:
 
         now = int(time.time())
         data = self.build_data(citys)
-        # print(data)
+        print(data)
 
-        # for i in data:
-        #     hotel_info = self.read_hotel_info(i['info'][0])  # 读取酒店详情信息
-        #
-        #     # 酒店信息
-        #     self.db.cursor.execute('select id from hotel where hotel_id = %d limit 1' % i['info'][0])
-        #     result = self.db.cursor.fetchone()
-        #     if not result:
-        #         # 新增数据
-        #         self.db.insert_data('hotel', {
-        #             'hotel_id': i['info'][0],
-        #             'name': i['info'][1],
-        #             'score': str(i['info'][2]),
-        #             'area': i['info'][3],
-        #             'address': hotel_info.get('addr', ''),
-        #             'city': i['city'],
-        #             'update_time': now,
-        #         })
-        #         rel += 1
-        #     else:  # 更新数据
-        #         ...
-        #
-        #     # 房间信息
-        #     for room in i['rooms']:
-        #         self.db.cursor.execute('select id from hotel_room where goods_id = %d and time = %d limit 1' % (room['goodsid'], now))
-        #         has = self.db.cursor.fetchone()
-        #         if not has:#避免重复
-        #             self.db.insert_data('hotel_room', {
-        #                 'goods_id': room['goodsid'],
-        #                 'hotel_id': i['info'][0],
-        #                 'name': room['name'],
-        #                 'price': room['price'],
-        #                 'inv_remain': str(room['inv_remain']),
-        #                 'desc': room['desc'],
-        #                 'use_time': room['use_time'],
-        #                 'time': now,
-        #             })
-        #             rel += 1
-        #
-        # return rel
+        for i in data:
+            hotel_info = self.read_hotel_info(i['info'][0])  # 读取酒店详情信息
+
+            # 酒店信息
+            self.db.cursor.execute('select id from hotel where hotel_id = %d limit 1' % i['info'][0])
+            result = self.db.cursor.fetchone()
+            if not result:
+                # 新增数据
+                self.db.insert_data('hotel', {
+                    'hotel_id': i['info'][0],
+                    'name': i['info'][1],
+                    'score': str(i['info'][2]),
+                    'area': i['info'][3],
+                    'address': hotel_info.get('addr', ''),
+                    'city': i['city'],
+                    'update_time': now,
+                })
+                rel += 1
+            else:  # 更新数据
+                ...
+
+            # 房间信息
+            for room in i['rooms']:
+                self.db.cursor.execute('select id from hotel_room where goods_id = %d and time = %d limit 1' % (room['goodsid'], now))
+                has = self.db.cursor.fetchone()
+                if not has:#避免重复
+                    self.db.insert_data('hotel_room', {
+                        'goods_id': room['goodsid'],
+                        'hotel_id': i['info'][0],
+                        'name': room['name'],
+                        'price': room['price'],
+                        'inv_remain': str(room['inv_remain']),
+                        'desc': room['desc'],
+                        'use_time': room['use_time'],
+                        'time': now,
+                    })
+                    rel += 1
+
+        return rel
     
     
     def insert_data2(self,citys):
@@ -425,8 +425,8 @@ class Meituan:
     
     
 # In[]:
-conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': '123456','db': 'meituan_hotel', 'charset': 'utf8'}
-m = Meituan(db_config=conf)
+conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': 'root','db': 'meituan_hotel', 'charset': 'utf8'}
+m = Meituan2(db_config=conf)
 m.insert_data(['kunming'])
     
     

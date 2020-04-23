@@ -1,5 +1,5 @@
 __pycache__
-*.txt
+Proxies/example.txt
 .idea
 .vscode
 !example.txt
