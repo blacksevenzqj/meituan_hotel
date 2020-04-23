@@ -1,0 +1,3 @@
+[submodule "Proxies"]
+	path = Proxies
+	url = https://github.com/Hootrix/Proxies.git
