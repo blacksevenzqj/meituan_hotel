@@ -133,6 +133,7 @@ class Meituan2:
         try:
             _room_info = self.request(uri=uri, params=params)
             room_info = _room_info.json()
+            print(room_info)
             return room_info
         except json.decoder.JSONDecodeError as e:
             # print(_room_info.text)
@@ -305,6 +306,7 @@ class Meituan2:
                         else:  # 暂不可订
                             ...
 
+                        # 单位是分，所以除以100
                         price = room['averagePrice'] / 100
 
                         rel[item[0]]['rooms'].append({
@@ -331,12 +333,17 @@ class Meituan2:
         print(data)
 
         for i in data:
+            print(i)
             hotel_info = self.read_hotel_info(i['info'][0])  # 读取酒店详情信息
+            print(hotel_info['lng'], hotel_info['lat'], hotel_info['introduction'], hotel_info['hotelStar'], hotel_info['poiAttrTagList'],  hotel_info['useRuleTime'], hotel_info['positionDescList'][0]['text'])
+            print()
 
             # 酒店信息
             self.db.cursor.execute('select id from hotel where hotel_id = %d limit 1' % i['info'][0])
             result = self.db.cursor.fetchone()
             if not result:
+                temp_poiAttrTag = ','.join(hotel_info['poiAttrTagList'])
+
                 # 新增数据
                 self.db.insert_data('hotel', {
                     'hotel_id': i['info'][0],
@@ -346,6 +353,13 @@ class Meituan2:
                     'address': hotel_info.get('addr', ''),
                     'city': i['city'],
                     'update_time': now,
+                    'lng': hotel_info['lng'],
+                    'lat': hotel_info['lat'],
+                    'introduction': hotel_info['introduction'],
+                    'hotelStar': hotel_info['hotelStar'],
+                    'poiAttrTagList': temp_poiAttrTag,
+                    'useRuleTime': hotel_info['useRuleTime'],
+                    'positionDesc': hotel_info['positionDescList'][0]['text'],
                 })
                 rel += 1
             else:  # 更新数据
@@ -425,7 +439,7 @@ class Meituan2:
     
     
 # In[]:
-conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': 'root','db': 'meituan_hotel', 'charset': 'utf8'}
+conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': '123456','db': 'meituan_hotel', 'charset': 'utf8'}
 m = Meituan2(db_config=conf)
 m.insert_data(['kunming'])
     
