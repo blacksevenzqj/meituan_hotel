@@ -65,6 +65,18 @@ class JiuBa:
         re = s.get(uri, params=params, headers=headers, timeout=5) #必须设置超时时间使用代理不能一直等待
         return re
 
+    def request_json(self, uri, params={}):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+            'Cookie': '__utmb=1',  # __utmb 移动端访问的标记
+            'Content-Type': 'application/json;charset=utf-8',
+            'Connection': 'close',
+        }
+        s = curl.session()
+        s.keep_alive = False  # 关闭多余连接
+
+        re = s.get(uri, params=params, headers=headers, timeout=5).json()
+        return re
 
     def hotel_rooms(self, id):
         '''
@@ -442,7 +454,10 @@ outer_list = soup.find_all("dl", attrs={"class":"list", "gaevent":"search/list"}
 for outer in outer_list:
     one = outer.contents[1]
     a1 = one.find("a", attrs={"class": "react"})
-    print(a1.attrs['href'])
+    jiuba_href = a1.attrs['href']
+    print(jiuba_href)
+    jiuba_id = jiuba_href[jiuba_href.rfind("/") + 1:]
+    print("酒吧ID is ", jiuba_id)
     name1 = a1.find("span", attrs={"class": "poiname"})
     print(name1.string)
 
@@ -488,7 +503,12 @@ for outer in outer_list:
             goods1 = i.find("a", attrs={"class": "react"})
             # print(goods1)
             # print()
-            print(goods1.attrs['href'])
+            goods1_href = goods1.attrs['href']
+            print(goods1_href)
+            goods1_href_temp1 = goods1_href[goods1_href.rfind("/") + 1:]
+            goods1_href_temp2 = goods1_href_temp1[:goods1_href_temp1.find(".")]
+            print("套餐ID is ", goods1_href_temp2)  # 624190488
+
             print(goods1.find("div", attrs={"class": "title text-block"}).string)
             print(goods1.find("span", attrs={"class": "strong"}).string)
             print(goods1.find("span", attrs={"class": "strong-color"}).string)
@@ -503,6 +523,46 @@ for outer in outer_list:
             print()
             goods1_ys = i.find("a", attrs={"class": "statusInfo"})
             print(goods1_ys.string)
+
+            print("*"*30)
+
+            try:
+                # Ajax请求：
+                # https://www.meituan.com/dz/deal/624190488
+                goods_href = "https://i.meituan.com/general/platform/dztg/getdealskustructdetail.json?dealGroupId=" + goods1_href_temp2
+                print(goods_href)
+                goods1_content = j.request_json(goods_href)
+                print(goods1_content)
+
+                if goods1_content['optionalGroups'] or goods1_content['mustGroups']:
+                    print(goods1_content['title'], goods1_content['marketPrice'], goods1_content['price'])
+                    if goods1_content['desc']:
+                        print(BeautifulSoup(goods1_content['desc'], "html.parser").text)
+                if goods1_content['optionalGroups']:
+                    for goods1_group in goods1_content['optionalGroups']:
+                        print(goods1_group['desc'])
+                        for item in goods1_group['dealStructInfo']:
+                            print(item['title'], item['price'], item['copies'])
+                        print("-" * 30)
+                if goods1_content['mustGroups']:
+                    for goods1_group in goods1_content['mustGroups']:
+                        for items in goods1_group['dealStructInfo']:
+                            for item in items["items"]:
+                                print(item['value'], item['name'])
+                        print("-" * 30)
+
+                main1_href = "https://i.meituan.com/general/platform/mttgdetail/mtdealbasegn.json?dealid=" + goods1_href_temp2 + "&shopid=&eventpromochannel=&stid=&lat=&lng="
+                print(main1_href)
+                main1_content = j.request_json(main1_href)
+                print(main1_content)
+                print(main1_content['title'], main1_content['solds'], main1_content['soldStr'], main1_content['start'],
+                      main1_content['end'], main1_content['dealBuyConfig']['buttonText'])
+                print(main1_content['shop']['name'], main1_content['shop']['phone'], main1_content['shop']['addr'],
+                      main1_content['shop']['lat'], main1_content['shop']['lng'])
+            except:
+                print("Desc is Error")
+                print()
+            print("*"*30)
             print()
     except:
         print("None of Goods")

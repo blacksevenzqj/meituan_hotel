@@ -7,6 +7,7 @@ from pyquery import PyQuery as pq
 from bs4 import BeautifulSoup
 from db.Db import Db
 from multiprocessing import Pool
+from urllib import parse
 
 # In[]:
 class JiuBa:
@@ -112,6 +113,18 @@ class JiuBa:
         re = s.get(uri, params=params, headers=headers, timeout=5) #必须设置超时时间使用代理不能一直等待
         return re
 
+    def request_json(self, uri, params={}):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+            'Cookie': '__utmb=1',  # __utmb 移动端访问的标记
+            'Content-Type': 'application/json;charset=utf-8',
+            'Connection': 'close',
+        }
+        s = curl.session()
+        s.keep_alive = False  # 关闭多余连接
+
+        re = s.get(uri, params=params, headers=headers, timeout=5).json()
+        return re
 
     def hotel_rooms(self, id):
         '''
@@ -494,7 +507,7 @@ outer_list = soup.find_all("dl", attrs={"class":"list", "gaevent":"search/list"}
 # print(outer_list[0].contents[3])
 
 one = outer_list[0].contents[1]
-print(one)
+# print(one)
 print()
 a1 = one.find("a", attrs={"class":"react"})
 print(a1.attrs['href'])
@@ -536,47 +549,98 @@ print()
 
 two = outer_list[0].contents[3]
 dd_list = two.find_all("dl", attrs={"class":"list bd-deal-list"})
-# # print(dd_list)
-# dd1 = dd_list[0]
-# # print(dd1)
-# dd_list2 = dd1.find_all("dd")
-# # print(dd_list2)
-# # print(dd_list2[0])
-# dd11 = dd_list2[0]
-# goods1 = dd11.find("a", attrs={"class":"react"})
-# print(goods1)
-# print()
-# print(goods1.attrs['href'])
-# print(goods1.find("div", attrs={"class":"title text-block"}).string)
-# print(goods1.find("span", attrs={"class":"strong"}).string)
-# print(goods1.find("span", attrs={"class":"strong-color"}).string)
-# try:
-#     print(goods1.find("del").string)
-# except:
-#     print("没有")
-# print()
-# goods1_ys = dd11.find("a", attrs={"class":"statusInfo"})
-# print(goods1_ys.string)
-# print()
 
-dd_list2 = dd_list[0].find_all("dd")
-for i in dd_list2:
-    goods1 = i.find("a", attrs={"class": "react"})
-    # print(goods1)
-    # print()
-    print(goods1.attrs['href'])
-    print(goods1.find("div", attrs={"class": "title text-block"}).string)
-    print(goods1.find("span", attrs={"class": "strong"}).string)
-    print(goods1.find("span", attrs={"class": "strong-color"}).string)
-    try:
-        print(goods1.find("span", attrs={"class": "tag"}).string)
-    except:
-        print("没有")
-    try:
-        print(goods1.find("del").string)
-    except:
-        print("没有")
-    print()
-    goods1_ys = i.find("a", attrs={"class": "statusInfo"})
-    print(goods1_ys.string)
-    print()
+# print(dd_list)
+dd1 = dd_list[0]
+# print(dd1)
+dd_list2 = dd1.find_all("dd")
+# print(dd_list2)
+# print(dd_list2[1])
+dd11 = dd_list2[1]
+goods1 = dd11.find("a", attrs={"class":"react"})
+# print(goods1)
+print()
+goods1_href = goods1.attrs['href']
+print(goods1_href)
+print(goods1.find("div", attrs={"class":"title text-block"}).string)
+print(goods1.find("span", attrs={"class":"strong"}).string)
+print(goods1.find("span", attrs={"class":"strong-color"}).string)
+try:
+    print(goods1.find("del").string)
+except:
+    print("没有")
+print()
+goods1_ys = dd11.find("a", attrs={"class":"statusInfo"})
+print(goods1_ys.string)
+print()
+
+# Ajax请求：
+# https://www.meituan.com/dz/deal/624190488
+temp1 = goods1_href[goods1_href.rfind("/") + 1:]
+temp2 = temp1[:temp1.find(".")]
+print(temp2) # 624190488
+goods1_href = "https://i.meituan.com/general/platform/dztg/getdealskustructdetail.json?dealGroupId=" + temp2
+print(goods1_href)
+goods1_content = j.request_json(goods1_href)
+print(goods1_content)
+
+print(goods1_content['title'], goods1_content['marketPrice'], goods1_content['price'], BeautifulSoup(goods1_content['desc'], "html.parser").text)
+for goods1_group in goods1_content['optionalGroups']:
+    print(goods1_group['desc'])
+    for item in goods1_group['dealStructInfo']:
+        print(item['title'], item['price'], item['copies'])
+    print("-"*30)
+
+main1_href = "https://i.meituan.com/general/platform/mttgdetail/mtdealbasegn.json?dealid=" + temp2 + "&shopid=&eventpromochannel=&stid=&lat=&lng="
+print(main1_href)
+main1_content = j.request_json(main1_href)
+print(main1_content)
+print(main1_content['title'], main1_content['solds'], main1_content['soldStr'], main1_content['start'], main1_content['end'], main1_content['dealBuyConfig']['buttonText'])
+print(main1_content['shop']['name'], main1_content['shop']['phone'], main1_content['shop']['addr'], main1_content['shop']['lat'], main1_content['shop']['lng'])
+
+
+print("="*30)
+
+
+goods1_href = "https://i.meituan.com/general/platform/dztg/getdealskustructdetail.json?dealGroupId=630704985"
+print(goods1_href)
+goods1_content = j.request_json(goods1_href)
+print(goods1_content)
+
+for goods1_group in goods1_content['mustGroups']:
+    for items in goods1_group['dealStructInfo']:
+        for item in items["items"]:
+            print(item['value'], item['name'])
+    print("-"*30)
+
+main1_href = "https://i.meituan.com/general/platform/mttgdetail/mtdealbasegn.json?dealid=630704985&shopid=&eventpromochannel=&stid=&lat=&lng="
+print(main1_href)
+main1_content = j.request_json(main1_href)
+print(main1_content)
+print(main1_content['title'], main1_content['solds'], main1_content['soldStr'], main1_content['start'], main1_content['end'], main1_content['dealBuyConfig']['buttonText'])
+print(main1_content['shop']['name'], main1_content['shop']['phone'], main1_content['shop']['addr'], main1_content['shop']['lat'], main1_content['shop']['lng'])
+
+
+
+
+# dd_list2 = dd_list[0].find_all("dd")
+# for i in dd_list2:
+#     goods1 = i.find("a", attrs={"class": "react"})
+#     # print(goods1)
+#     # print()
+#     print(goods1.attrs['href'])
+#     print(goods1.find("div", attrs={"class": "title text-block"}).string)
+#     print(goods1.find("span", attrs={"class": "strong"}).string)
+#     print(goods1.find("span", attrs={"class": "strong-color"}).string)
+#     try:
+#         print(goods1.find("span", attrs={"class": "tag"}).string)
+#     except:
+#         print("没有")
+#     try:
+#         print(goods1.find("del").string)
+#     except:
+#         print("没有")
+#     print()
+#     goods1_ys = i.find("a", attrs={"class": "statusInfo"})
+#     print(goods1_ys.string)
+#     print()
