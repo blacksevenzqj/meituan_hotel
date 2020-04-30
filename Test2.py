@@ -8,5 +8,8 @@ print(b[b.find("售")+1:])
 
 
 aaa = {"name":"123"}
-if aaa["age"]:
+if aaa["name"]:
     print(123)
+
+bbb = "100元"
+print(bbb[:-1])

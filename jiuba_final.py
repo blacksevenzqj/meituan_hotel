@@ -1,3 +1,5 @@
+#coding=utf-8
+
 import base64
 import zlib
 import re,json,os
@@ -90,12 +92,12 @@ class JiuBa:
                 package['package_id'] = ""
                 package['bar_id'] = ""
                 package['package_name'] = ""
-                package['package_price'] = ""
+                package['package_price'] = 0.0
                 package['package_unit'] = ""
                 package['activity'] = ""
-                package['market_price'] = ""
-                package['sales_volume'] = ""
-                package['sales_time_period'] = ""
+                package['market_price'] = 0.0
+                package['sales_volume'] = 0
+                package['sales_time_period'] = 0
                 package['effective_start_date'] = ""
                 package['effective_end_date'] = ""
                 package['package_title'] = ""
@@ -122,7 +124,7 @@ class JiuBa:
 
                 market_price = goods1.find("del")
                 if market_price is not None:
-                    market_price = float(market_price.string)
+                    market_price = float(market_price.string[:-1])
                 else:
                     market_price = 0.0
                 package["market_price"] = market_price
@@ -314,12 +316,14 @@ class JiuBa:
         return data
 
     def insert_data(self,city,business_id):
-        rel = 0
-
+        bar_num = 0
         now = int(time.time())
-        data = self.build_data(city, business_id)
+        # data = self.build_data(city, business_id)
+
+        data = [{'bar_id': '1641244426', 'bar_name': 'WOW酒馆（北京路店）', 'tuan': '团', 'juan': '券', 'wai': '', 'bar_score': 4.9, 'business': '同德昆明广场', 'bar_phone': '18502800168/16606646694', 'bar_address': '北京路金色年华广场2楼', 'lng': 102.7233593631883, 'lat': 25.069190350290118, 'packages': [{'package_id': '636936705', 'package_name': '代金券', 'package_price': '89', 'package_unit': '元', 'activity': '', 'market_price': '100元', 'sales_volume': '3', 'package_title': '仅售89元，价值100元代金券！', 'sales_time_period': '半年消费3', 'effective_start_date': 'Apr 13, 2020 11:02:40 AM', 'effective_end_date': 'May 9, 2021 11:59:59 PM', 'items_data': []}, {'package_id': '624190488', 'package_name': '百威/乐堡二选一小食小聚超值体验套餐', 'package_price': '39.9', 'package_unit': '元', 'activity': '休闲娱乐团购新用户减42元', 'market_price': '108元', 'sales_volume': '1381', 'package_rule': '1.每人每天限用1张，单桌使用总数不能超过4张。', 'package_title': '仅售39.9元，价值108元百威/乐堡二选一小食小聚超值体验套餐！', 'sales_time_period': '半年消费1826', 'effective_start_date': 'Dec 9, 2019 4:00:18 PM', 'effective_end_date': 'Jan 9, 2021 11:59:59 PM', 'items_data': [{'item_name': '百威啤酒', 'item_price': '15', 'item_unit': '元', 'copies_nm': '6'}, {'item_name': '乐堡啤酒', 'item_price': '15', 'item_unit': '元', 'copies_nm': '6'}, {'item_name': '风味豆干', 'item_price': '18', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '冰毛豆', 'item_price': '18', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '花生米', 'item_price': '15', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '凉拌黄瓜', 'item_price': '15', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '624194967', 'package_name': '女士专享鸡尾酒1杯/饮品限时抢购', 'package_price': '1', 'package_unit': '元', 'activity': '', 'market_price': '28元', 'sales_volume': '403', 'package_rule': '1.每人每天最多可用2张', 'package_title': '仅售1元，价值28元女士专享鸡尾酒1杯/饮品限时抢购！', 'sales_time_period': '半年消费357', 'effective_start_date': 'Dec 9, 2019 4:15:36 PM', 'effective_end_date': 'Jan 5, 2021 11:59:59 PM', 'items_data': [{'item_name': '墨西哥日出', 'item_price': '28', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '白俄罗斯', 'item_price': '28', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '天使堕落', 'item_price': '28', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '玛格丽特', 'item_price': '28', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '莫吉托', 'item_price': '28', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '奶奶遇上冰沙', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '金桔柠檬', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '初恋味道', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '柠檬蜂蜜茶', 'item_price': '15', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '624200971', 'package_name': '花酒斗酒系列乐享体验套餐', 'package_price': '58', 'package_unit': '元', 'activity': '休闲娱乐团购新用户减29.4元', 'market_price': '123元', 'sales_volume': '239', 'package_rule': '本系列果酒为WOW特制而成，每种酒由12杯为一套，清爽可口，颜值炫目，且可自由组合搭配', 'package_title': '仅售58元，价值123元花酒斗酒系列乐享体验套餐！', 'sales_time_period': '半年消费241', 'effective_start_date': 'Dec 9, 2019 4:37:08 PM', 'effective_end_date': 'Jan 9, 2021 11:59:59 PM', 'items_data': [{'item_name': '桃花醉', 'item_price': '98', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '红颜笑', 'item_price': '98', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '蓝颜痴', 'item_price': '98', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '青梅弄', 'item_price': '98', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '黄非红', 'item_price': '98', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '水果沙拉', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '624403704', 'package_name': '多人进口啤酒新店特惠套餐', 'package_price': '108', 'package_unit': '元', 'activity': '', 'market_price': '210元', 'sales_volume': '322', 'package_title': '仅售108元，价值210元多人进口啤酒新店特惠套餐！', 'sales_time_period': '半年消费331', 'effective_start_date': 'Dec 10, 2019 11:54:29 AM', 'effective_end_date': 'Jan 9, 2021 11:59:59 PM', 'items_data': [{'item_name': '乐堡啤酒', 'item_price': '15', 'item_unit': '元', 'copies_nm': '12'}, {'item_name': '百威啤酒', 'item_price': '15', 'item_unit': '元', 'copies_nm': '12'}, {'item_name': '科罗娜啤酒', 'item_price': '15', 'item_unit': '元', 'copies_nm': '12'}, {'item_name': '鸡米花', 'item_price': '30', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '624587912', 'package_name': '网红野格红牛洋酒单瓶小食超值套餐', 'package_price': '198', 'package_unit': '元', 'activity': '', 'market_price': '293元', 'sales_volume': '143', 'package_title': '仅售198元，价值293元网红野格红牛洋酒单瓶小食超值套餐！', 'sales_time_period': '半年消费150', 'effective_start_date': 'Dec 11, 2019 9:45:16 AM', 'effective_end_date': 'May 9, 2021 11:59:59 PM', 'items_data': [{'item_name': '占边威士忌', 'item_price': '183', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '野格', 'item_price': '253', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '绝对伏特加', 'item_price': '253', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '红牛', 'item_price': '40', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '红茶', 'item_price': '40', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '绿茶', 'item_price': '40', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '雪碧', 'item_price': '40', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '可乐', 'item_price': '32', 'item_unit': '元', 'copies_nm': '1'}]}]}, {'bar_id': '168919511', 'bar_name': '黑森林酒吧（同德店）', 'tuan': '团', 'juan': '', 'wai': '外', 'bar_score': 4.7, 'business': '同德昆明广场', 'bar_phone': '0871-65360216', 'bar_address': '人民中路正义坊北馆4楼', 'lng': 102.70803650012134, 'lat': 25.04362587157603, 'packages': [{'package_id': '36920794', 'package_name': '5L黑森林自酿啤酒套餐', 'package_price': '249', 'package_unit': '元', 'activity': '', 'market_price': '417元', 'sales_volume': '7505', 'package_title': '仅售249元，价值417元5L黑森林自酿啤酒套餐，不限时段通用，免费WiFi！', 'sales_time_period': '半年消费770', 'effective_start_date': 'Mar 26, 2016 10:40:50 AM', 'effective_end_date': 'Dec 26, 2020 11:59:59 PM', 'items_data': []}, {'package_id': '36152494', 'package_name': '4~6人芬兰伏特加套餐', 'package_price': '198', 'package_unit': '元', 'activity': '', 'market_price': '351元', 'sales_volume': '1343', 'package_title': '仅售198元，价值351元4~6人芬兰伏特加套餐，不限时段通用，免费WiFi！', 'sales_time_period': '半年消费239', 'effective_start_date': 'Mar 6, 2016 12:00:01 AM', 'effective_end_date': 'Dec 26, 2020 11:59:59 PM', 'items_data': []}, {'package_id': '55980114', 'package_name': '2-4人野格利口酒套餐', 'package_price': '329', 'package_unit': '元', 'activity': '', 'market_price': '384元', 'sales_volume': '244', 'package_title': '仅售329元，价值384元2-4人野格利口酒套餐，不限时段通用，免费WiFi！', 'sales_time_period': '半年消费101', 'effective_start_date': 'Mar 19, 2019 9:52:05 AM', 'effective_end_date': 'Dec 26, 2020 11:59:59 PM', 'items_data': []}]}, {'bar_id': '184182228', 'bar_name': '长亭酒馆（同德昆明广场店）', 'tuan': '团', 'juan': '', 'wai': '', 'bar_score': 4.0, 'business': '同德昆明广场', 'bar_phone': '18206870097', 'bar_address': '北京路928号同德昆明广场负一楼', 'lng': 102.71926106548113, 'lat': 25.072037989141876, 'packages': [{'package_id': '625385813', 'package_name': '百威啤酒套餐', 'package_price': '228', 'package_unit': '元', 'activity': '', 'market_price': '285元', 'sales_volume': '5', 'package_rule': '购买须知由于订桌紧张，需每日18点以前预约，21点前需要到店周五周六法定节假日不能使用。如有任何疑问请拨打18206870097咨询', 'package_title': '仅售228元，价值285元百威啤酒套餐，不限时段通用，免费WiFi！', 'sales_time_period': '半年消费5', 'effective_start_date': 'Dec 17, 2019 5:33:49 PM', 'effective_end_date': 'Dec 17, 2020 11:59:00 PM', 'items_data': [{'item_name': '油呛鱿鱼', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '油呛毛肚', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '油呛螺肉', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '百威啤酒1打', 'item_price': '220', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '冰毛豆', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '纸巾', 'item_price': '5', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '625444403', 'package_name': '洋酒套餐', 'package_price': '418', 'package_unit': '元', 'activity': '', 'market_price': '520元', 'sales_volume': '1', 'package_rule': '购买须知由于订桌紧张，需每日18点以前预约，21点前需要到店周五周六法定节假日不能使用。如有任何疑问请拨打18206870097咨询', 'package_title': '仅售418元，价值520元洋酒套餐，不限时段通用，免费WiFi！', 'sales_time_period': '半年消费1', 'effective_start_date': 'Dec 17, 2019 5:24:24 PM', 'effective_end_date': 'Jan 13, 2021 11:59:59 PM', 'items_data': [{'item_name': '油呛鱿鱼', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '油呛毛肚', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '油呛螺肉', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '野格力嬌', 'item_price': '360', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '红牛4听', 'item_price': '60', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '码头卤牛肉', 'item_price': '35', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '铁壳花生', 'item_price': '25', 'item_unit': '元', 'copies_nm': '1'}, {'item_name': '纸巾', 'item_price': '5', 'item_unit': '元', 'copies_nm': '1'}]}]}, {'bar_id': '195577724', 'bar_name': '花家+（昆明广场店）', 'tuan': '团', 'juan': '', 'wai': '外', 'bar_score': 4.4, 'business': '同德昆明广场', 'bar_phone': '0871-63815267', 'bar_address': '白云路同德广场悦汇坊1楼', 'lng': 102.72152345610544, 'lat': 25.06980430402594, 'packages': [{'package_id': '617838942', 'package_name': '代金券', 'package_price': '87', 'package_unit': '元', 'activity': '', 'market_price': '100元', 'sales_volume': '4', 'package_title': '仅售87元，价值100元代金券，全场通用！', 'sales_time_period': '半年消费5', 'effective_start_date': 'Oct 30, 2019 12:53:17 PM', 'effective_end_date': 'Oct 28, 2020 11:59:59 PM', 'items_data': []}, {'package_id': '617852396', 'package_name': '精酿黑啤多人套餐+小吃', 'package_price': '249', 'package_unit': '元', 'activity': '', 'market_price': '409元', 'sales_volume': '184', 'package_rule': '精酿黑啤3升 338冰毛豆1份26薯片1份20豆腐干1份20纸巾1盒5', 'package_title': '仅售249元，价值409元精酿黑啤多人套餐+小吃，免费WiFi！', 'sales_time_period': '半年消费188', 'effective_start_date': 'Oct 30, 2019 2:06:11 PM', 'effective_end_date': 'Oct 28, 2020 11:59:59 PM', 'items_data': [{'item_name': '精酿黑啤多人套餐', 'item_price': '409', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '630704985', 'package_name': '野格1瓶套餐', 'package_price': '329', 'package_unit': '元', 'activity': '', 'market_price': '469元', 'sales_volume': '6', 'package_rule': '野格1瓶350红牛4听68冰毛豆1份26薯片1份20', 'package_title': '仅售329元，价值469元野格1瓶套餐，免费WiFi！', 'sales_time_period': '半年消费6', 'effective_start_date': 'Jan 17, 2020 9:48:24 AM', 'effective_end_date': 'Oct 28, 2020 11:59:59 PM', 'items_data': [{'item_name': '野格套餐', 'item_price': '469', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '617853200', 'package_name': '豪帅龙舌兰银标1瓶套餐', 'package_price': '398', 'package_unit': '元', 'activity': '', 'market_price': '469元', 'sales_volume': '9', 'package_rule': '豪帅银标龙舌兰1瓶480雪碧4听60冰毛豆1份26薯片1份20纸巾1盒5', 'package_title': '仅售398元，价值469元豪帅龙舌兰银标1瓶套餐！', 'sales_time_period': '半年消费11', 'effective_start_date': 'Oct 30, 2019 11:57:18 AM', 'effective_end_date': 'Oct 28, 2020 11:59:59 PM', 'items_data': [{'item_name': '野格套餐', 'item_price': '469', 'item_unit': '元', 'copies_nm': '1'}]}, {'package_id': '630400901', 'package_name': '杰克丹尼1瓶套餐+小吃', 'package_price': '398', 'package_unit': '元', 'activity': '', 'market_price': '469元', 'sales_volume': '0', 'package_rule': '杰克丹尼1瓶480可乐4听60冰毛豆1份26薯片1份20纸巾1盒5', 'package_title': '仅售398元，价值469元杰克丹尼1瓶套餐+小吃，免费WiFi！', 'sales_time_period': '半年消费0', 'effective_start_date': 'Jan 17, 2020 6:30:34 PM', 'effective_end_date': 'Oct 28, 2020 11:59:59 PM', 'items_data': [{'item_name': '野格套餐', 'item_price': '469', 'item_unit': '元', 'copies_nm': '1'}]}]}, {'bar_id': '177453261', 'bar_name': '原点酒吧', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 4.0, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '169154345', 'bar_name': '原点origin（同德店）', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 4.0, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '182195280', 'bar_name': 'MAO Livehouse昆明店', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 3.5, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '1634850214', 'bar_name': '享站吧精酿啤酒直供站（昆明广场店）', 'tuan': '', 'juan': '', 'wai': '外', 'bar_score': 4.0, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '195843994', 'bar_name': 'LOU锈NGE', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 3.5, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '177739371', 'bar_name': '倍轻松（同德昆明广场店）', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 3.5, 'business': '同德昆明广场', 'packages': []}, {'bar_id': '677223130', 'bar_name': 'The fall(坠） bar', 'tuan': '', 'juan': '', 'wai': '', 'bar_score': 0.0, 'business': '同德昆明广场', 'packages': []}]
 
         for i in data:
+            package_num = 0
             print("i['bar_id'] is ", i['bar_id'])
             self.db.cursor.execute('select id from bar where bar_id = %s limit 1' % i['bar_id'])
             result = self.db.cursor.fetchone()
@@ -341,7 +345,7 @@ class JiuBa:
                     'wai': i['wai'],
                     'bar_update_time': now
                 })
-                rel += 1
+                bar_num += 1
             else:  # 更新数据
                 ...
 
@@ -357,18 +361,34 @@ class JiuBa:
                         'package_price': package['package_price'],
                         'package_unit': package['package_unit'],
                         'activity': package['activity'],
-                        'market_price': package['market_price'],
+                        # 'market_price': package['market_price'],
                         'sales_volume': package['sales_volume'],
                         'sales_time_period': package['sales_time_period'],
                         'effective_start_date': package['effective_start_date'],
                         'effective_end_date': package['effective_end_date'],
                         'package_title': package['package_title'],
-                        'package_rule': package['package_rule'],
+                        # 'package_rule': package['package_rule'],
                         'package_update_time': now,
                     })
-                    rel += 1
+                    package_num += 1
 
-        return rel
+                item_num = 0
+                for item in package['items_data']:
+                    self.db.cursor.execute('select id from bar_package_item where item_update_time = %d limit 1' % (now))
+                    has2 = self.db.cursor.fetchone()
+                    if not has:  # 避免重复
+                        self.db.insert_data('bar_package_item', {
+                            'item_name': item['item_name'],
+                            'item_price': item['item_price'],
+                            'item_unit': item['item_unit'],
+                            'copies_nm': item['copies_nm'],
+                            'item_rule': item['item_rule'],
+                            'package_id': item['package_id'],
+                            'item_update_time': now,
+                        })
+                        item_num += 1
+
+        return bar_num
     
     
     def insert_data2(self,citys):
