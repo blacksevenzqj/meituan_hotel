@@ -492,6 +492,8 @@ for outer in outer_list:
 
     juli1 = one.find("span", attrs={"data-com": "locdist"})  # 应该是Ajax请求的
     print("juli1 is ", juli1)
+    tongde1 = one.find('a', onclick='return false;').string  # one.find('a', onclick=True)
+    print(tongde1)
 
     print()
 
@@ -513,16 +515,16 @@ for outer in outer_list:
             print(goods1.find("span", attrs={"class": "strong"}).string)
             print(goods1.find("span", attrs={"class": "strong-color"}).string)
             try:
-                print(goods1.find("span", attrs={"class": "tag"}).string)
+                print("活动 is ", goods1.find("span", attrs={"class": "tag"}).string)
             except:
-                print("没有")
+                print("活动 is 没有")
             try:
-                print(goods1.find("del").string)
+                print("门市价 is ", goods1.find("del").string)
             except:
-                print("没有")
+                print("门市价 is 没有")
             print()
             goods1_ys = i.find("a", attrs={"class": "statusInfo"})
-            print(goods1_ys.string)
+            print("已售 is ", goods1_ys.string)
 
             print("*"*30)
 

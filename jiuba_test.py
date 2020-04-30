@@ -544,6 +544,8 @@ print(scores1.string)
 
 juli1 = one.find("span", attrs={"data-com":"locdist"}) # 应该是Ajax请求的
 print(juli1)
+tongde1 = one.find('a', onclick='return false;') # one.find('a', onclick=True)
+print(tongde1)
 
 print()
 
