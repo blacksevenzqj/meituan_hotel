@@ -402,27 +402,8 @@ class JiuBa:
 
         return bar_num
     
-    
-    def insert_data2(self,citys):
-        """写入数据库"""
-        rel = 0
-        now = int(time.time())
-        # 酒店信息
-       
-        # 新增数据
-        self.db.insert_data('hotel', {
-            'hotel_id': '456',
-            'name': "456",
-            'score': "789",
-            'area': "101112",
-            'address': "131415",
-            'city': "161718",
-            'update_time': now,
-        })
-        rel += 1
-     
 
-conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': '123456','db': 'meituan_bar', 'charset': 'utf8'}
+conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': 'root','db': 'meituan_bar', 'charset': 'utf8mb4'}
 j = JiuBa(db_config=conf)
 name = 'kunming'
 bid = 14437 # 同德广场
