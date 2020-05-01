@@ -100,7 +100,7 @@ SELECT a.`bar_id`, a.bar_name AS '酒吧名称',a.bar_score AS '得分',a.bar_ph
 b.package_id, b.package_name AS '套餐名称', b.package_price AS '套餐价格', b.package_unit AS '套餐价格单位',b.`activity` AS '活动',b.`limit_price` AS '限时抢购价',b.`market_price` AS '市场价',b.`sales_volume` AS '已售数量',b.`sales_time_period` AS '半年消费数量',b.`effective_start_date` AS '有效期起始时间',b.`effective_end_date` AS '有效期结束时间',b.`package_title` AS '套餐标题',b.`package_rule` AS '套餐规则',
 c.`id`, c.item_name AS '商品名称',c.`item_price` AS '商品价格',c.`item_unit` AS '商品价格单位',c.`copies_nm` AS '份数',c.`item_rule` AS '商品规则'
 FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id`
-ORDER BY a.`bar_score` DESC, b.`package_name` DESC, c.`item_price` DESC
+ORDER BY a.`bar_score` DESC, b.`package_name` DESC, c.`item_rule` DESC
 
 
 
