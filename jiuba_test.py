@@ -460,7 +460,7 @@ class JiuBa:
 # m.insert_data(['kunming'])
     
 # In[]:
-conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': '123456','db': 'meituan_hotel', 'charset': 'utf8'}
+conf = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': 'root','db': 'meituan_hotel', 'charset': 'utf8'}
 j = JiuBa(db_config=conf)
 
 name = 'kunming'
@@ -576,6 +576,19 @@ goods1_ys = dd11.find("a", attrs={"class":"statusInfo"})
 print(goods1_ys.string)
 print()
 
+# 抢购按钮
+from selenium import webdriver
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
+driver = webdriver.Chrome(chrome_options=chrome_options)
+driver.get("https:" + goods1_href)
+page_source = driver.page_source
+soup_button = BeautifulSoup(page_source, "html.parser")
+button_str = soup_button.find("button", attrs={"class":"buy"}).string
+print(button_str)
+
+'''
 # Ajax请求：
 # https://www.meituan.com/dz/deal/624190488
 temp1 = goods1_href[goods1_href.rfind("/") + 1:]
@@ -621,7 +634,7 @@ main1_content = j.request_json(main1_href)
 print(main1_content)
 print(main1_content['title'], main1_content['solds'], main1_content['soldStr'], main1_content['start'], main1_content['end'], main1_content['dealBuyConfig']['buttonText'])
 print(main1_content['shop']['name'], main1_content['shop']['phone'], main1_content['shop']['addr'], main1_content['shop']['lat'], main1_content['shop']['lng'])
-
+'''
 
 
 

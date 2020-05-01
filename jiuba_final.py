@@ -80,6 +80,31 @@ class JiuBa:
         re = s.get(uri, params=params, headers=headers, timeout=5).json()
         return re
 
+
+    # 限时抢购按钮
+    def read_ajax_page(self, goods_href):
+        from selenium import webdriver
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver.get(goods_href)
+        page_source = driver.page_source
+        soup_button = BeautifulSoup(page_source, "html.parser")
+        button_str = soup_button.find("button", attrs={"class": "buy"})
+        limit_price = 0.0
+        if button_str:
+            button_str = button_str.string
+            if "¥" in button_str and "限时抢购" in button_str:
+                index = button_str.find("限时抢购")
+                limit_price = button_str[1:index].strip()
+                try:
+                    limit_price = float(limit_price)
+                except:
+                    print("¥ 限时抢购 字符串截取错误" )
+        return limit_price
+
+
     def read_bars_packages(self, outer):
         packages = []
         bar_temp_info = {}
@@ -95,6 +120,7 @@ class JiuBa:
                 package['package_price'] = 0.0
                 package['package_unit'] = ""
                 package['activity'] = ""
+                package['limit_price'] = 0.0
                 package['market_price'] = 0.0
                 package['sales_volume'] = 0
                 package['sales_time_period'] = 0
@@ -118,16 +144,15 @@ class JiuBa:
                 activity = goods1.find("span", attrs={"class": "tag"})
                 if activity is not None:
                     activity = activity.string
-                else:
-                    activity = ""
-                package["activity"] = activity
+                    goods1_des_href = "https:" + goods1_href
+                    limit_price = self.read_ajax_page(goods1_des_href)
+                    package["activity"] = activity
+                    package["limit_price"] = limit_price
 
                 market_price = goods1.find("del")
                 if market_price is not None:
                     market_price = float(market_price.string[:-1])
-                else:
-                    market_price = 0.0
-                package["market_price"] = market_price
+                    package["market_price"] = market_price
 
                 sales_volume = i.find("a", attrs={"class": "statusInfo"}).string
                 package["sales_volume"] = sales_volume[sales_volume.find("售") + 1:]
@@ -145,7 +170,8 @@ class JiuBa:
 
                     if goods1_content['optionalGroups'] or goods1_content['mustGroups']:
                         print(goods1_content['title'], goods1_content['marketPrice'], goods1_content['price'])
-                        if package["market_price"]:
+                        # if条件判断认为：1、字符串非空、数字非0、数字非0.0 为True；2、字符串空、数字0、数字0.0 为False：
+                        if not package["market_price"]:
                             package["market_price"] = float(goods1_content['marketPrice'][:-1])
                         if goods1_content['desc']:
                             package["package_rule"] = BeautifulSoup(goods1_content['desc'], "html.parser").text
@@ -373,6 +399,7 @@ class JiuBa:
                         'package_price': package['package_price'],
                         'package_unit': package['package_unit'],
                         'activity': package['activity'],
+                        'limit_price': package["limit_price"],
                         'market_price': package['market_price'],
                         'sales_volume': package['sales_volume'],
                         'sales_time_period': package['sales_time_period'],

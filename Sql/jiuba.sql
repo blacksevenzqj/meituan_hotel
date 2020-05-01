@@ -28,6 +28,7 @@ CREATE TABLE `bar_package` (
   `package_price` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '套餐价格',
   `package_unit` VARCHAR(5) NOT NULL DEFAULT '元' COMMENT '价格单位',
   `activity` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '活动',
+  `limit_price` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '限时抢购价格',
   `market_price` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '门市价',
   `sales_volume` INT(10) NOT NULL DEFAULT '0' COMMENT '已售数量',
   `sales_time_period` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '时间段已售数量',
@@ -95,11 +96,11 @@ CREATE TABLE `hotel_desc` (
 
 
 
-SELECT a.bar_name AS 酒吧名称,a.bar_score AS 得分,a.bar_phone AS 电话,a.city AS 城市,a.area AS 区,a.business AS 商圈,a.bar_address AS 地址,a.tuan AS 团购,a.juan AS 优惠劵,a.wai AS 外卖,FROM_UNIXTIME(a.bar_update_time, '%Y-%m-%d %H:%i:%S') AS '更新时间',
-b.package_name 套餐名称, b.package_price 套餐价格, b.package_unit 套餐价格单位,b.`activity` 活动,b.`market_price` 市场价,b.`sales_volume` 已售,b.`sales_time_period` 半年消费,b.`effective_start_date` 有效期起始时间,b.`effective_end_date` 有效期结束时间,b.`package_title` 套餐标题,b.`package_rule` 套餐规则,
-c.item_name 商品名称,c.`item_price` 商品价格,c.`item_unit` 商品价格单位,c.`copies_nm` 份数,c.`item_rule` 商品规则
+SELECT a.`bar_id`, a.bar_name AS '酒吧名称',a.bar_score AS '得分',a.bar_phone AS '电话',a.city AS '城市',a.area AS '区',a.business AS '商圈',a.bar_address AS '地址',a.tuan AS '团购',a.juan AS '优惠劵',a.wai AS '外卖',FROM_UNIXTIME(a.bar_update_time, '%Y-%m-%d %H:%i:%S') AS '更新时间',
+b.package_id, b.package_name AS '套餐名称', b.package_price AS '套餐价格', b.package_unit AS '套餐价格单位',b.`activity` AS '活动',b.`limit_price` AS '限时抢购价',b.`market_price` AS '市场价',b.`sales_volume` AS '已售数量',b.`sales_time_period` AS '半年消费数量',b.`effective_start_date` AS '有效期起始时间',b.`effective_end_date` AS '有效期结束时间',b.`package_title` AS '套餐标题',b.`package_rule` AS '套餐规则',
+c.`id`, c.item_name AS '商品名称',c.`item_price` AS '商品价格',c.`item_unit` AS '商品价格单位',c.`copies_nm` AS '份数',c.`item_rule` AS '商品规则'
 FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id`
-ORDER BY a.`bar_score` DESC
+ORDER BY a.`bar_score` DESC, b.`package_name` DESC, c.`item_price` DESC
 
 
 
