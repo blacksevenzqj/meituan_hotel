@@ -53,7 +53,7 @@ class JiuBa:
         return self.encode(token)
 
 
-    def request(self, uri, params={}):
+    def request(self, uri, params={}, timeout=5):
 
         # https://ihotel.meituan.com/group/v1/yf/list/182625269? =1&=&end=1558022400000&&poi=189285561&uuid=ca95f911ce774f3888f2.1557842544.1.0.0&iuuid=5C473294DD7181724F044F8D89DC9FBBAEBD8C0103686B511EF7D4DA04CB4857&_token=
         headers = {
@@ -64,10 +64,10 @@ class JiuBa:
         s = curl.session()
         s.keep_alive = False  # 关闭多余连接
 
-        re = s.get(uri, params=params, headers=headers, timeout=5) #必须设置超时时间使用代理不能一直等待
+        re = s.get(uri, params=params, headers=headers, timeout=timeout) #必须设置超时时间使用代理不能一直等待
         return re
 
-    def request_json(self, uri, params={}):
+    def request_json(self, uri, params={}, timeout=5):
         headers = {
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
             'Cookie': '__utmb=1',  # __utmb 移动端访问的标记
@@ -77,7 +77,7 @@ class JiuBa:
         s = curl.session()
         s.keep_alive = False  # 关闭多余连接
 
-        re = s.get(uri, params=params, headers=headers, timeout=5).json()
+        re = s.get(uri, params=params, headers=headers, timeout=timeout).json()
         return re
 
 
@@ -165,7 +165,7 @@ class JiuBa:
                     # https://www.meituan.com/dz/deal/624190488
                     goods_href = "https://i.meituan.com/general/platform/dztg/getdealskustructdetail.json?dealGroupId=" + goods1_href_temp2
                     print(goods_href)
-                    goods1_content = j.request_json(goods_href)
+                    goods1_content = j.request_json(goods_href, timeout=10)
                     print(goods1_content)
 
                     if goods1_content['optionalGroups'] or goods1_content['mustGroups']:
@@ -217,7 +217,7 @@ class JiuBa:
 
                     main1_href = "https://i.meituan.com/general/platform/mttgdetail/mtdealbasegn.json?dealid=" + goods1_href_temp2 + "&shopid=&eventpromochannel=&stid=&lat=&lng="
                     print(main1_href)
-                    main1_content = j.request_json(main1_href)
+                    main1_content = j.request_json(main1_href, timeout=10)
                     print(main1_content)
                     print(main1_content['title'], main1_content['solds'], main1_content['soldStr'],
                           main1_content['start'],
@@ -236,7 +236,12 @@ class JiuBa:
                         bar_temp_info["lng"] = main1_content['shop']['lng']
                         bar_temp_info["lat"] = main1_content['shop']['lat']
 
-                except:
+                except IndexError as ie:
+                    print('IndexError', ie)
+                except KeyError as ke:
+                    print('KeyError', ke)
+                except Exception as e:
+                    print('Error', e)
                     print("Desc is Error")
                     print()
                 print("*" * 30)
