@@ -105,19 +105,35 @@ CREATE TABLE `bar_desc` (
 
 
 # distinct
-SELECT a.`bar_id`, a.bar_name AS '酒吧名称',a.bar_score AS '得分',a.bar_phone AS '电话',a.city AS '城市',a.area AS '区',a.business AS '商圈',a.bar_address AS '地址',a.tuan AS '团购',a.juan AS '优惠劵',a.wai AS '外卖',
+SELECT a.`bar_id`, a.bar_name AS '酒吧名称',a.bar_score AS '得分',a.bar_phone AS '电话',a.city AS '城市',a.area AS '区',a.business AS '商圈',a.bar_address AS '地址',a.`lng` AS '经度',a.`lat` AS '纬度',a.tuan AS '团购',a.juan AS '优惠劵',a.wai AS '外卖',
 b.package_id, b.package_name AS '套餐名称', b.package_price AS '套餐价格', b.package_unit AS '套餐价格单位',b.`activity` AS '套餐活动',b.`limit_price` AS '套餐限时抢购价',b.`market_price` AS '市场价',b.`sales_volume` AS '已售数量',b.`sales_time_period` AS '半年消费数量',b.`effective_start_date` AS '套餐有效期起始时间',b.`effective_end_date` AS '套餐有效期结束时间',b.`package_title` AS '套餐标题',b.`package_rule` AS '套餐规则',
 c.`id`, c.item_name AS '商品名称',c.`item_price` AS '商品价格',c.`item_unit` AS '商品价格单位',c.`copies_nm` AS '份数',c.`item_rule` AS '商品规则',FROM_UNIXTIME(b.`package_update_time`, '%Y-%m-%d %H:%i:%S') AS '更新时间'
-FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id`
+FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id` AND b.`package_update_time` = c.`item_update_time`
 ORDER BY b.`package_update_time` DESC, a.`bar_score` DESC, a.`bar_name` DESC, b.`package_name` DESC, c.`item_rule` DESC
 
 
-
-SELECT a.`bar_id`, a.bar_name,a.bar_score,a.bar_phone,a.city,a.area,a.business,a.bar_address,a.tuan,a.juan,a.wai,
+SELECT a.`bar_id`, a.bar_name,a.bar_score,a.bar_phone,a.city,a.area,a.business,a.bar_address,a.`lng`,a.`lat`,a.tuan,a.juan,a.wai,
 b.package_id, b.package_name, b.package_price, b.package_unit,b.`activity`,b.`limit_price`,b.`market_price`,b.`sales_volume`,b.`sales_time_period`,b.`effective_start_date`,b.`effective_end_date`,b.`package_title`,b.`package_rule`,
 c.`id`, c.item_name,c.`item_price`,c.`item_unit`,c.`copies_nm`,c.`item_rule`,FROM_UNIXTIME(b.package_update_time, '%Y-%m-%d %H:%i:%S') AS package_update_time
-FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id`
+FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id` AND b.`package_update_time` = c.`item_update_time`
 ORDER BY b.`package_update_time` DESC, a.`bar_score` DESC, a.`bar_name` DESC, b.`package_name` DESC, c.`item_rule` DESC
+
+
+SELECT * FROM (
+	SELECT a.`bar_id`, a.bar_name,a.bar_score,a.bar_phone,a.city,a.area,a.business,a.bar_address,a.`lng`,a.`lat`,a.tuan,a.juan,a.wai,
+	b.package_id, b.package_name, b.package_price, b.package_unit,b.`activity`,b.`limit_price`,b.`market_price`,b.`sales_volume`,b.`sales_time_period`,b.`effective_start_date`,b.`effective_end_date`,b.`package_title`,b.`package_rule`,
+	c.`id`, c.item_name,c.`item_price`,c.`item_unit`,c.`copies_nm`,c.`item_rule`,FROM_UNIXTIME(b.package_update_time, '%Y-%m-%d %H:%i:%S') AS package_update_time
+	FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id` AND b.`package_update_time` = c.`item_update_time`
+	ORDER BY b.`package_update_time` DESC, a.`bar_score` DESC, a.`bar_name` DESC, b.`package_name` DESC, c.`item_rule` DESC
+) AS temp WHERE package_name = '百威/乐堡二选一小食小聚超值体验套餐'
+
+
+
+ CREATE VIEW bar_view AS SELECT a.`bar_id`, a.bar_name,a.bar_score,a.bar_phone,a.city,a.area,a.business,a.bar_address,a.`lng`,a.`lat`,a.tuan,a.juan,a.wai,
+	b.package_id, b.package_name, b.package_price, b.package_unit,b.`activity`,b.`limit_price`,b.`market_price`,b.`sales_volume`,b.`sales_time_period`,b.`effective_start_date`,b.`effective_end_date`,b.`package_title`,b.`package_rule`,
+	c.`id`, c.item_name,c.`item_price`,c.`item_unit`,c.`copies_nm`,c.`item_rule`,FROM_UNIXTIME(b.package_update_time, '%Y-%m-%d %H:%i:%S') AS package_update_time
+	FROM `bar` a LEFT JOIN `bar_package` b ON a.`bar_id` = b.`bar_id` LEFT JOIN `bar_package_item` c ON b.`package_id` = c.`package_id` AND b.`package_update_time` = c.`item_update_time`
+	ORDER BY b.`package_update_time` DESC, a.`bar_score` DESC, a.`bar_name` DESC, b.`package_name` DESC, c.`item_rule` DESC
 
 
 
