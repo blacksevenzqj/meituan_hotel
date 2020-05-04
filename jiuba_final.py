@@ -165,7 +165,7 @@ class JiuBa:
                     # https://www.meituan.com/dz/deal/624190488
                     goods_href = "https://i.meituan.com/general/platform/dztg/getdealskustructdetail.json?dealGroupId=" + goods1_href_temp2
                     print(goods_href)
-                    goods1_content = j.request_json(goods_href, timeout=10)
+                    goods1_content = j.request_json(goods_href, timeout=20)
                     print(goods1_content)
 
                     if goods1_content['optionalGroups'] or goods1_content['mustGroups']:
@@ -217,7 +217,7 @@ class JiuBa:
 
                     main1_href = "https://i.meituan.com/general/platform/mttgdetail/mtdealbasegn.json?dealid=" + goods1_href_temp2 + "&shopid=&eventpromochannel=&stid=&lat=&lng="
                     print(main1_href)
-                    main1_content = j.request_json(main1_href, timeout=10)
+                    main1_content = j.request_json(main1_href, timeout=20)
                     print(main1_content)
                     print(main1_content['title'], main1_content['solds'], main1_content['soldStr'],
                           main1_content['start'],
