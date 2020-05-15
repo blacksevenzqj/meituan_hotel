@@ -72,12 +72,31 @@ print(hotel_orders_data3['o_room_number'].isna())
 hotel_orders_data3['o_room_number'] = hotel_orders_data3['o_room_number'].fillna(np.nan)
 
 # In[]:
+# hotel_orders_data3.loc[:, hotel_orders_data3['o_is_pay'] == '已支付' & hotel_orders_data3['o_is_delete'] == '正常']
+hotel_orders_income = hotel_orders_data3.loc[(hotel_orders_data3['o_is_pay'] == '已支付') & (hotel_orders_data3['o_is_delete'] == '正常') & (hotel_orders_data3['o_status'] != '申请退款中')]
+# In[]:
+hotel_orders_refund = hotel_orders_data3.loc[(hotel_orders_data3['o_is_pay'] == '已支付') & (hotel_orders_data3['o_is_delete'] == '删除') | (hotel_orders_data3['o_status'] == '申请退款中')]
+# In[]:
+
+ccc = hotel_orders_income[hotel_orders_income['o_user_name'] == '戴林晔']
+ddd = hotel_orders_refund[hotel_orders_refund['o_user_name'] == '戴林晔']
 
 
+# In[]:
+sns.set(font='SimHei', font_scale=1.3)
 
+# In[]:
+fig, ax = plt.subplots(1,1,figsize=(18,20))
+sns.barplot(x='o_pay_type', y='o_total_price', data=hotel_orders_income, ax=ax, ci=None, estimator=sum
+           )
+ax.set_xlabel("")
+ax.set_ylabel("支付价格")
+ax.set_title("房间支付价格")
 
+# In[]:
+print(set(hotel_orders_data3['o_rt_hotel_room_name']))
 
-
+unique_label, counts_label, unique_dict = ft.category_quantity_statistics_all(hotel_orders_data3['o_rt_hotel_room_name'])
 
 
 
