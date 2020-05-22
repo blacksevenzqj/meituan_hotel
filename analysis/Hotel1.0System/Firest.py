@@ -74,24 +74,72 @@ hotel_orders_data3['o_room_number'] = hotel_orders_data3['o_room_number'].fillna
 # In[]:
 # hotel_orders_data3.loc[:, hotel_orders_data3['o_is_pay'] == '已支付' & hotel_orders_data3['o_is_delete'] == '正常']
 hotel_orders_income = hotel_orders_data3.loc[(hotel_orders_data3['o_is_pay'] == '已支付') & (hotel_orders_data3['o_is_delete'] == '正常') & (hotel_orders_data3['o_status'] != '申请退款中')]
+hotel_orders_data3.loc[hotel_orders_income.index, 'revenue'] = '流水'
 # In[]:
 hotel_orders_refund = hotel_orders_data3.loc[(hotel_orders_data3['o_is_pay'] == '已支付') & (hotel_orders_data3['o_is_delete'] == '删除') | (hotel_orders_data3['o_status'] == '申请退款中')]
+hotel_orders_data3.loc[hotel_orders_refund.index, 'revenue'] = '退款'
+# In[]:
+hotel_orders_unpaid = hotel_orders_data3.loc[(hotel_orders_data3['o_is_pay'] == '未支付')]
+hotel_orders_data3.loc[hotel_orders_unpaid.index, 'revenue'] = '未支付'
 # In[]:
 
+
+# In[]:
 ccc = hotel_orders_income[hotel_orders_income['o_user_name'] == '戴林晔']
 ddd = hotel_orders_refund[hotel_orders_refund['o_user_name'] == '戴林晔']
+
 
 
 # In[]:
 sns.set(font='SimHei', font_scale=1.3)
 
 # In[]:
-fig, ax = plt.subplots(1,1,figsize=(18,20))
-sns.barplot(x='o_pay_type', y='o_total_price', data=hotel_orders_income, ax=ax, ci=None, estimator=sum
+# print(hotel_orders_data3[hotel_orders_data3['revenue'] == '流水']['o_total_price'].count())
+# print(np.sum(hotel_orders_data3[hotel_orders_data3['revenue'] == '流水']['o_total_price']))
+aaa = pd.DataFrame(hotel_orders_data3.groupby("revenue", as_index=False)['o_total_price'].sum())
+print(aaa.loc[aaa['revenue'] == '流水', "o_total_price"].values[0])
+
+
+# In[]:
+# 1、酒店订单 → 流水 → 支付方式
+fig, ax = plt.subplots(1,2,figsize=(18,20))
+sns.barplot(x='revenue', y='o_total_price', hue='o_pay_type', data=hotel_orders_data3, ax=ax[0], ci=None, estimator=sum,
+            order=hotel_orders_data3.groupby("revenue")['o_total_price'].sum().sort_values(ascending=False).index,
+            hue_order=hotel_orders_data3.groupby("o_pay_type")['o_total_price'].sum().sort_values(ascending=False).index
            )
-ax.set_xlabel("")
-ax.set_ylabel("支付价格")
-ax.set_title("房间支付价格")
+ax[0].set_xlabel("")
+ax[0].set_ylabel("订单价格")
+ax[0].set_title("酒店订单价格")
+ax[0].text(0, 50000, '占比：%.2f' % 123, ha='center', va='bottom') # fontsize=8
+# axe[0].text(0, defRValue + 0.03, '默认阈值0：%.4f' % defRValue, ha='center', va='bottom')
+# axe[0].text(0, defFValue - 0.03, '默认阈值0：%.4f' % defFValue, ha='center', va='bottom') 
+
+sns.barplot(x='revenue', y='o_total_price', hue='o_pay_type', data=hotel_orders_data3, ax=ax[1], ci=None, estimator=np.size,
+            order=hotel_orders_data3.groupby("revenue")['o_total_price'].count().sort_values(ascending=False).index,
+            hue_order=hotel_orders_data3.groupby("o_pay_type")['o_total_price'].count().sort_values(ascending=False).index
+           )
+ax[1].set_xlabel("")
+ax[1].set_ylabel("订单数量")
+ax[1].set_title("酒店订单数量")
+
+# In[]:
+# 2、酒店订单 → 支付方式 → 流水
+fig, ax = plt.subplots(1,2,figsize=(18,20))
+sns.barplot(x='o_pay_type', y='o_total_price', hue='revenue', data=hotel_orders_data3, ax=ax[0], ci=None, estimator=sum,
+            order=hotel_orders_data3.groupby("o_pay_type")['o_total_price'].sum().sort_values(ascending=False).index,
+            hue_order=hotel_orders_data3.groupby("revenue")['o_total_price'].sum().sort_values(ascending=False).index
+           )
+ax[0].set_xlabel("")
+ax[0].set_ylabel("订单价格")
+ax[0].set_title("酒店订单价格")
+
+sns.barplot(x='o_pay_type', y='o_total_price', hue='revenue', data=hotel_orders_data3, ax=ax[1], ci=None, estimator=np.size,
+            order=hotel_orders_data3.groupby("o_pay_type")['o_total_price'].count().sort_values(ascending=False).index,
+            hue_order=hotel_orders_data3.groupby("revenue")['o_total_price'].count().sort_values(ascending=False).index
+           )
+ax[1].set_xlabel("")
+ax[1].set_ylabel("订单数量")
+ax[1].set_title("酒店订单数量")
 
 # In[]:
 print(set(hotel_orders_data3['o_rt_hotel_room_name']))
@@ -100,10 +148,11 @@ unique_label, counts_label, unique_dict = ft.category_quantity_statistics_all(ho
 
 
 
+# In[]:
+print(np.size(hotel_orders_data3['o_rt_hotel_room_name']))
+
+print(hotel_orders_data3['o_rt_hotel_room_name'].count())
 
 
-
-
-
-
+np.length(hotel_orders_data3['o_rt_hotel_room_name'])
 
